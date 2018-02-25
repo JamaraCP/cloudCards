@@ -10,108 +10,13 @@
 	
     <link rel="stylesheet" href="css/bootstrap.min.css" >
 	<script src="js/jquery-3.2.1.js"></script>    
-  <script src="https://www.gstatic.com/firebasejs/4.10.1/firebase.js"></script>         
+  <script src="https://www.gstatic.com/firebasejs/4.10.1/firebase.js"></script>     
+  <script src="js/main.js" ></script>      
   <script src="js/login.js" ></script>
   </head>
   <body>
 	<script>
-    $(document).ready(function(){
-     // listar(); 
-     pageLoginCards();
-    });
-    
-    function listar(){
-      var divCard = $('#listar'); 
-      divCard.show(); //NEW
-      $.ajax({
-          url:'http://andrecosta.info/cards/',
-          type:'GET',
-          dataType:'json',
-          data:'',
-          beforeSend: function() {
-            divCard.empty();
-            divCard.html('<div><img src="https://equilter.com/assets/images/loading.gif" /></div>');
-          },
-          success:function(result){
-            if(result.success){             
-              var cardAux = '';
-              //var count = 0;
-              divCard.html('');
-              $.each(result.data,function(i,card){
-                cardAux = '<div class="col-md-4">'+
-                        '<div class="card" id="card_'+card.id+'">'+
-                          '<img class="card-img-top" src="'+card.url_imagem+'" alt="Card Solar">'+
-                          '<div class="card-body">'+
-                          '<h4 class="card-title"><span>'+card.likes+' Curtidas</span></h4>'+
-                          '<p class="card-text">'+card.descricao+'</p>'+
-                          '<div style="float:left">'+
-                            '<button class="btn btn-danger" onclick="excluir('+card.id+')" >Excluir</button>'+
-                            '<button class="btn btn-success" onclick="curtir('+card.id+')">Curtir</button>'+
-                          '</div>'+
-                          '</div>'+
-                          '<div>'+
-                        '</div>'+
-                      '</div>';
-                //count++;
-                divCard.append(cardAux);
-                
-                
-              });
-              
-              
-            }
-          },
-          error:function(xhr,resp,text){}
-        }); 
-    }
-    
-    function cadastrar(){
-      var url   = $('#inpURL').val();
-      var descr = $('#inpDesc').val();
-      $.ajax({
-          url:'http://andrecosta.info/cards/',
-          type:'POST',
-          dataType:'json',
-          data:'url_imagem='+url+'&descricao='+descr,
-          success:function(result){
-            alert(result.data);
-            $('#cadastrar').modal('toggle');
-            listar();
-            $('#inpURL').val("");
-            $('#inpDesc').val("");
-          },
-          error:function(xhr,resp,text){}
-        }); 
-    }
-    
-    function excluir(cardid){
-      $.ajax({
-          url:'http://andrecosta.info/cards/',
-          type:'DELETE',
-          dataType:'json',
-          data:'id='+cardid,
-          success:function(result){
-            alert(result.data);
-            listar();
-          },
-          error:function(xhr,resp,text){}
-        }); 
-    }
-    
-    function curtir(cardid){
-      $.ajax({
-          url:'http://andrecosta.info/cards/like/',
-          type:'POST',
-          dataType:'json',
-          data:'id='+cardid,
-          success:function(result){
-            alert(result.data);
-            console.log(result.qtd_likes+" Curtidas");
-            $('#card_'+cardid+' h4').html(result.qtd_likes+" Curtidas");
-          },
-          error:function(xhr,resp,text){}
-        }); 
-    }
+ 
   </script>
   
    <div class="container">
@@ -198,7 +103,6 @@
   <script type="text/javascript" src="cordova.js"></script>
   <script type="text/javascript" src="js/index.js"></script>
 
-  <script src="js/main.js" ></script>
   <script src="js/card.js" ></script> 
   <script type="text/javascript">
         app.initialize();
