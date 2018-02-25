@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Cloud Cards</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+	
+    <link rel="stylesheet" href="css/bootstrap.min.css" >
+	<script src="js/jquery-3.2.1.js"></script>    
+  <script src="https://www.gstatic.com/firebasejs/4.10.1/firebase.js"></script>         
+  <script src="js/login.js" ></script>
+  </head>
+  <body>
+	<script>
+    $(document).ready(function(){
+     // listar(); 
+     pageLoginCards();
+    });
+    
+    function listar(){
+      var divCard = $('#listar'); 
+      divCard.show(); //NEW
+      $.ajax({
+          url:'http://andrecosta.info/cards/',
+          type:'GET',
+          dataType:'json',
+          data:'',
+          beforeSend: function() {
+            divCard.empty();
+            divCard.html('<div><img src="https://equilter.com/assets/images/loading.gif" /></div>');
+          },
+          success:function(result){
+            if(result.success){             
+              var cardAux = '';
+              //var count = 0;
+              divCard.html('');
+              $.each(result.data,function(i,card){
+                cardAux = '<div class="col-md-4">'+
+                        '<div class="card" id="card_'+card.id+'">'+
+                          '<img class="card-img-top" src="'+card.url_imagem+'" alt="Card Solar">'+
+                          '<div class="card-body">'+
+                          '<h4 class="card-title"><span>'+card.likes+' Curtidas</span></h4>'+
+                          '<p class="card-text">'+card.descricao+'</p>'+
+                          '<div style="float:left">'+
+                            '<button class="btn btn-danger" onclick="excluir('+card.id+')" >Excluir</button>'+
+                            '<button class="btn btn-success" onclick="curtir('+card.id+')">Curtir</button>'+
+                          '</div>'+
+                          '</div>'+
+                          '<div>'+
+                        '</div>'+
+                      '</div>';
+                //count++;
+                divCard.append(cardAux);
+                
+                
+              });
+              
+              
+            }
+          },
+          error:function(xhr,resp,text){}
+        }); 
+    }
+    
+    function cadastrar(){
+      var url   = $('#inpURL').val();
+      var descr = $('#inpDesc').val();
+      $.ajax({
+          url:'http://andrecosta.info/cards/',
+          type:'POST',
+          dataType:'json',
+          data:'url_imagem='+url+'&descricao='+descr,
+          success:function(result){
+            alert(result.data);
+            $('#cadastrar').modal('toggle');
+            listar();
+            $('#inpURL').val("");
+            $('#inpDesc').val("");
+          },
+          error:function(xhr,resp,text){}
+        }); 
+    }
+    
+    function excluir(cardid){
+      $.ajax({
+          url:'http://andrecosta.info/cards/',
+          type:'DELETE',
+          dataType:'json',
+          data:'id='+cardid,
+          success:function(result){
+            alert(result.data);
+            listar();
+          },
+          error:function(xhr,resp,text){}
+        }); 
+    }
+    
+    function curtir(cardid){
+      $.ajax({
+          url:'http://andrecosta.info/cards/like/',
+          type:'POST',
+          dataType:'json',
+          data:'id='+cardid,
+          success:function(result){
+            alert(result.data);
+            console.log(result.qtd_likes+" Curtidas");
+            $('#card_'+cardid+' h4').html(result.qtd_likes+" Curtidas");
+          },
+          error:function(xhr,resp,text){}
+        }); 
+    }
+  </script>
+  
+   <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light divbase"  style="float:left" id="navBarCards">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">     
+          <li class="nav-item">
+            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#cadastrarCard">
+              Cadastrar
+            </button>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="btn btn-link" data-toggle="button" onclick="logout()">
+              Logout
+            </button>
+          </li>    
+        </ul>
+      </div>
+    </nav><h1 id="txtTitulo"></h1>
+    <br>
+    <div   class="row divbase" id="listar">
+   
+    </div>
+    
+    <div   class="modal fade" id="cadastrarCard">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Cadastrar Novo Card</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          </div>
+          <div class="modal-body">          
+          <div  class="row col-md-12">
+            <div class="col-md-10 form-group">              
+              <label>Imagem:</label>
+              <input class="form-control" type="file"  id="inpImg"/>
+              <progress value="0" max="100" id="progressImg">
+            </div>
+          </div>  
+          <div  class="row col-md-12">
+            <div class="col-md-8 form-group">             
+              <label>Descrição:</label>
+              <input class="form-control" type="text" value="" maxlength="255" id="inpDesc"/>
+            </div>
+          </div>
+          </div>          
+          <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="btnCadCard" onclick="cadastrarCard()">Save changes</button>
+          </div>
+        </div>
+      </div>      
+    </div>
+
+    <div   class="row divbase" id="loginCard">
+      <form id="formlogin">
+            <div class="form-group">
+              <label for="email_login">Email</label>
+              <input type="text" id="email_login"  class="form-control">
+            </div> 
+            <div class="form-group">
+              <label for="senha_login">Senha</label>
+              <input type="paswword" id="senha_login"  class="form-control">
+            </div>        
+          
+            <button type="button"  id="btncadusuario" onclick="cadastrarUsuario()" class="btn btn-primary">Cadastrar</button>
+            <button type="button"  id="btnlogin" onclick="login()" class="btn btn-primary">Login</button>
+            <button type="button"  id="btnloginGit" onclick="logarComGitHub()" class="btn btn-primary">Login GitHub</button>
+
+        </form>
+    </div>
+  </div>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"  crossorigin="anonymous">
+  </script>
+  <script src="js/popper.min.js" ></script>
+  <script src="js/bootstrap.min.js" ></script>
+  <script type="text/javascript" src="cordova.js"></script>
+  <script type="text/javascript" src="js/index.js"></script>
+
+  <script src="js/main.js" ></script>
+  <script src="js/card.js" ></script> 
+  <script type="text/javascript">
+        app.initialize();
+  </script>
+  </body>
+  </html>
